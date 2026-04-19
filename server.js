@@ -163,17 +163,13 @@ app.post("/servicios", auth, (req, res) => {
 app.get("/servicios", auth, (req, res) => {
   const cliente_id = req.session.user.id;
 
-  db.query(
-    "SELECT * FROM servicios WHERE cliente_id = ?",
-    [cliente_id],
-    (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Error del servidor");
-      }
-      res.json(results);
-    },
-  );
+  db.query("SELECT * FROM servicios ", [cliente_id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Error del servidor");
+    }
+    res.json(results);
+  });
 });
 
 // UPDATE
