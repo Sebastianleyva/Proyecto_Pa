@@ -5,18 +5,33 @@
   <meta charset="UTF-8">
   <title>Servicios</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      /* Reemplaza 'tu-imagen.jpg' por la ruta donde guardes la imagen */
+      background-image: linear-gradient(rgba(248, 90, 90, 0.7), rgba(70, 114, 173, 0.7)),
+        url('fondo.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
 </head>
 
 <body class="container mt-4">
 
   <h2>CRUD Servicios</h2>
-  <a href="/dashboard" class="text-center">Regresar</a>
 
   <form id="form">
     <input class="form-control mb-2" name="tipo_servicio" placeholder="Servicio" required>
     <input class="form-control mb-2" name="ubicacion" placeholder="Ubicación" required>
     <input class="form-control mb-2" name="precio" type="number" placeholder="Precio" required>
-    <button class="btn btn-success">Guardar</button>
+    <center><button class="btn btn-success">Guardar</button></center>
   </form>
 
   <table class="table mt-4">
@@ -40,43 +55,37 @@
 
     // cargar datos
     function cargar() {
-
       fetch('/servicios')
-        .then(res => {
-          if (!res.ok) throw new Error("Error en respuesta");
-          return res.text();
-        })
+        .then(res => res.json()) // Cambiado a .json()
         .then(data => {
           tabla.innerHTML = '';
-
           data.forEach(s => {
             const row = document.createElement('tr');
-
+            // Usamos variables intermedias para mayor claridad
             row.innerHTML = `
-              <td>${s.tipo_servicio}</td>
-              <td>${s.ubicacion}</td>
-              <td>${s.precio}</td>
-              <td>
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
-              </td>
-            `;
+            <td>${s.tipo_servicio}</td>
+            <td>${s.ubicacion}</td>
+            <td>$${s.precio}</td>
+            <td>
+              <button class="btn btn-warning btn-sm btn-edit">Editar</button>
+              <button class="btn btn-danger btn-sm btn-delete">Eliminar</button>
+            </td>
+          `;
 
-            // eventos sin inline JS 
-            row.querySelector('.btn-warning').onclick = () =>
-              editar(s.id, s.tipo_servicio, s.ubicacion, s.precio);
-
-            row.querySelector('.btn-danger').onclick = () =>
-              eliminar(s.id);
+            row.querySelector('.btn-edit').onclick = () => editar(s.id, s.tipo_servicio, s.ubicacion, s.precio);
+            row.querySelector('.btn-delete').onclick = () => {
+              if (confirm('¿Seguro que quieres borrarlo?')) eliminar(s.id);
+            };
 
             tabla.appendChild(row);
           });
         })
         .catch(err => {
-          console.error(err);
-          tabla.innerHTML = '<tr><td colspan="4">Error cargando datos</td></tr>';
+          console.error("Error al cargar:", err);
+          tabla.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al conectar con el servidor</td></tr>';
         });
     }
+
 
     // guardar
     form.addEventListener('submit', e => {
@@ -129,6 +138,7 @@
     // 🔄 iniciar
     cargar();
   </script>
+  <a href="/dashboard" class="text-center" style="color: white; font-size: large;">Regresar</a>
 
 </body>
 
